@@ -1,8 +1,12 @@
+import random
+
+# TOOL SUPERCLASS
 class Tool:
     def __init__(self, price, name):
         self.price = price
         self.name = name
 
+# TOOL SUBCLASSES
 class WoodworkTool(Tool):
     def __init__(self, name):
         Tool.__init__(self, 10, name)
@@ -23,6 +27,7 @@ class PlumbingTool(Tool):
     def __init__(self, name):
         Tool.__init__(self, 3, name)
 
+
 class Rental:
     def __init__(self, tools, daysRented):
         self.tools = tools
@@ -31,6 +36,8 @@ class Rental:
 class HardwareStore:
     def __init__(self, inventory):
         self.inventory = []
+        self.rentals = []
+        self.day = 0
 
         for i in range(4):
             self.inventory.append(WoodworkTool("WoodworkTool" + str(i)))
@@ -44,6 +51,55 @@ class HardwareStore:
             self.inventory.append(PlumbingTool("PlumbingTool" + str(i)))
 
         self.profit = 0
+
+    def addRental(self, customer):
+        tools = self.getToolsForRental(customer.toolsAllowed)
+        nights = random.sample(customer.nightsAllowed, 1)[0]
+        self.rentals.append(Rental(tools, nights))
+
+    def removeRentals(self, rentals):
+        tools = []
+
+        for rental in rentals:
+            tools += rental.tools
+            self.rentals.remove(rental)
+
+        self.addToolsToInventory(tools)
+
+    def addToolsToInventory(self, tools):
+        for tool in tools:
+            self.inventory.append(tool)
+
+    def removeToolsFromInventory(self, tools):
+        for tool in tools:
+            self.inventory.remove(tool)
+
+    def getToolsForRental(self, toolsAllowed):
+        numTools = random.sample(toolsAllowed, 1)[0]
+        tools = random.sample(self.inventory, numTools)
+        self.removeToolsFromInventory(tools)
+        return tools
+
+    def decrementRentalDays(self):
+        for rental in self.rentals:
+            rental.daysRented -= 1
+
+    def findExpiredRentals(self):
+        expiredRentals = []
+
+        for rental in self.rentals:
+            if rental.daysRented <= 0:
+                expiredRentals.append(rental)
+
+        return expiredRentals
+
+    def advanceDay(self):
+        self.day += 1
+        self.decrementRentalDays()
+        expiredRentals = self.findExpiredRentals()
+        self.removeRentals(expiredRentals)
+
+
 
 class Customer:
     def __init__(self, toolsAllowed, nightsAllowed):
