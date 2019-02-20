@@ -34,7 +34,7 @@ class Rental:
         self.daysRented = daysRented
 
 class HardwareStore:
-    def __init__(self, inventory):
+    def __init__(self):
         self.inventory = []
         self.rentals = []
         self.day = 0
@@ -99,6 +99,20 @@ class HardwareStore:
         expiredRentals = self.findExpiredRentals()
         self.removeRentals(expiredRentals)
 
+    def display(self):
+        print("DAY: {}".format(self.day))
+        print("INVENTORY")
+        print("====================")
+        for tool in self.inventory:
+            print(tool.name)
+
+        print("\nRENTALS")
+        print("====================")
+        for rental in self.rentals:
+            print("Days Rented: {}".format(rental.daysRented))
+            print("Tools: {}".format([tool.name for tool in rental.tools]))
+
+        print("\n")
 
 
 class Customer:
@@ -117,3 +131,21 @@ class BusinessCustomer(Customer):
 class RegularCustomer(Customer):
     def __init__(self):
         Customer.__init__(self, set([1, 2, 3]), set([3, 4, 5]))
+
+hardwareStore = HardwareStore()
+hardwareStore.display()
+
+customer = BusinessCustomer()
+hardwareStore.addRental(customer)
+hardwareStore.display()
+
+customer2 = RegularCustomer()
+hardwareStore.addRental(customer2)
+hardwareStore.display()
+
+hardwareStore.advanceDay()
+hardwareStore.display()
+
+for _ in range(4):
+    hardwareStore.advanceDay()
+    hardwareStore.display()
