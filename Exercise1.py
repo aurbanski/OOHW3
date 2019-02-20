@@ -27,11 +27,15 @@ class PlumbingTool(Tool):
     def __init__(self, name):
         Tool.__init__(self, 3, name)
 
+
+
 # RENTAL CLASS
 class Rental:
     def __init__(self, tools, daysRented):
         self.tools = tools
         self.daysRented = daysRented
+
+
 
 # HARDWARE STORE CLASS - Contains majority of project logic
 class HardwareStore:
@@ -232,6 +236,8 @@ class HardwareStore:
             print("Tools: {}".format([tool.name for tool in rental.tools]))
         
 
+
+
 # CUSTOMER SUPERCLASS
 class Customer:
     def __init__(self, toolsAllowed, nightsAllowed, name):
@@ -252,6 +258,7 @@ class BusinessCustomer(Customer):
 class RegularCustomer(Customer):
     def __init__(self, name):
         Customer.__init__(self, set([1, 2, 3]), set([3, 4, 5]), name)
+
 
 
 
