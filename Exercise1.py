@@ -83,17 +83,28 @@ class HardwareStore:
 
         return totalCost
 
-    def addRental(self, customer):
-        toolsAllowed = [numTools for numTools in customer.toolsAllowed if not numTools > 3 - self.checkToolCount(customer)]
-        tools = self.getToolsForRental(toolsAllowed)
-        nights = random.sample(customer.nightsAllowed, 1)[0]
-        rental = Rental(tools, nights)
-        rentalCost = self.getRentalCost(rental)
+    def addCustomerRentals(self, customer, rental):
         customer.rentals.append(rental)
 
+    def addCurrentRentals(self, rental):
         self.currentRentals.append(rental)
+
+    def addAllRentals(self, rental, customer, rentalCost):
         self.allRentals.append((rental.tools, rental.daysRented, customer.name, rentalCost))
-        self.profit += rentalCost
+
+    def addRentals(self, customers):
+        for customer in customers:
+            toolsAllowed = [numTools for numTools in customer.toolsAllowed if not numTools > 3 - self.checkToolCount(customer)]
+            tools = self.getToolsForRental(toolsAllowed)
+            nights = random.sample(customer.nightsAllowed, 1)[0]
+            rental = Rental(tools, nights)
+            rentalCost = self.getRentalCost(rental)
+
+            self.addCustomerRentals(customer, rental)
+            self.addCurrentRentals(rental)
+            self.addAllRentals(rental, customer, rentalCost)
+
+            self.profit += rentalCost
 
     def removeCurrentRentals(self, rentals):
         tools = []
@@ -183,9 +194,7 @@ class HardwareStore:
         self.day += 1
         self.decrementRentalDays()
         self.removeRentals(expiredRentals)
-
-        for customer in customersToday:
-            self.addRental(customer)
+        self.addRentals(customersToday)
 
     def display(self):
         print("DAY: {}".format(self.day))
