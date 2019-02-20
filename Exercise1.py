@@ -27,12 +27,13 @@ class PlumbingTool(Tool):
     def __init__(self, name):
         Tool.__init__(self, 3, name)
 
-
+# RENTAL CLASS
 class Rental:
     def __init__(self, tools, daysRented):
         self.tools = tools
         self.daysRented = daysRented
 
+# HARDWARE STORE CLASS - Contains majority of project logic
 class HardwareStore:
     def __init__(self):
         self.inventory = []
@@ -40,8 +41,12 @@ class HardwareStore:
         self.allRentals = []
         self.day = 0
         self.profit = 0
-        self.customers = []
+        self.customers = []   
 
+        self.generateCustomers()
+        self.generateTools()     
+
+    def generateCustomers(self):
         for i in range(10):
             customerType = random.sample([0, 1, 2], 1)[0]
 
@@ -54,7 +59,7 @@ class HardwareStore:
 
             self.customers.append(customer)
 
-
+    def generateTools(self):
         for i in range(4):
             self.inventory.append(WoodworkTool("WoodworkTool" + str(i)))
         for i in range(4):
@@ -79,23 +84,31 @@ class HardwareStore:
         tools = self.getToolsForRental(toolsAllowed)
         nights = random.sample(customer.nightsAllowed, 1)[0]
         rental = Rental(tools, nights)
-        self.currentRentals.append(rental)
         rentalCost = self.getRentalCost(rental)
-        self.allRentals.append((rental.tools, rental.daysRented, customer.name, rentalCost))
         customer.rentals.append(rental)
+
+        self.currentRentals.append(rental)
+        self.allRentals.append((rental.tools, rental.daysRented, customer.name, rentalCost))
         self.profit += rentalCost
 
-    def removeRentals(self, rentals):
+    def removeCurrentRentals(self, rentals):
         tools = []
 
         for rental in rentals:
             tools += rental.tools
             self.currentRentals.remove(rental)
 
-        for customer in self.customers:
+        return tools
+
+    def removeCustomerRentals(self, customers):
+        for customer in customers:
             expiredRentals = self.findExpiredRentals(customer.rentals)
             for expiredRental in expiredRentals:
                 customer.rentals.remove(expiredRental)
+
+    def removeRentals(self, rentals):
+        tools = self.removeCurrentRentals(rentals)
+        self.removeCustomerRentals(self.customers)
 
         self.addToolsToInventory(tools)
 
@@ -159,12 +172,14 @@ class HardwareStore:
         return customersToday
 
     def advanceDay(self):
-        self.day += 1
         numberOfTools = len(self.inventory)
         customersToday = self.getCustomers(self.getMaxCustomers(numberOfTools))
-        self.decrementRentalDays()
         expiredRentals = self.findExpiredRentals(self.currentRentals)
+
+        self.day += 1
+        self.decrementRentalDays()
         self.removeRentals(expiredRentals)
+
         for customer in customersToday:
             self.addRental(customer)
 
@@ -217,6 +232,7 @@ class HardwareStore:
             print("Tools: {}".format([tool.name for tool in rental.tools]))
         
 
+# CUSTOMER SUPERCLASS
 class Customer:
     def __init__(self, toolsAllowed, nightsAllowed, name):
         self.toolsAllowed = toolsAllowed
@@ -224,6 +240,7 @@ class Customer:
         self.name = name
         self.rentals = []
 
+# CUSTOMER SUBCLASSES
 class CasualCustomer(Customer):
     def __init__(self, name):
         Customer.__init__(self, set([1, 2]), set([1, 2]), name)
@@ -236,6 +253,9 @@ class RegularCustomer(Customer):
     def __init__(self, name):
         Customer.__init__(self, set([1, 2, 3]), set([3, 4, 5]), name)
 
+
+
+# SIMULATION
 hardwareStore = HardwareStore()
 
 for _ in range(35):
