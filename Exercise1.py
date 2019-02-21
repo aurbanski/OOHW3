@@ -227,16 +227,16 @@ class HardwareStore:
 
         print("\nPROFIT")
         print("====================")
-        print(self.profit)
+        print("$" + str(self.profit))
 
         print("\nALL RENTALS")
         print("====================")
         for rental in self.allRentals:
             tools, daysRented, customerName, rentalCost = rental
             print("Customer: {}".format(customerName))
-            print("Days Rented: {}".format(daysRented))
-            print("Tools: {}".format([tool.name for tool in tools]))
-            print("Rental Cost: {}".format(rentalCost))
+            print("* Days Rented: {}".format(daysRented))
+            print("* Tools: {}".format([tool.name for tool in tools]))
+            print("* Rental Cost: {}".format(rentalCost))
 
         print("\nACTIVE RENTALS")
         print("====================")
